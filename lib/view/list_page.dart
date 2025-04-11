@@ -1,10 +1,12 @@
 import 'package:fluentui_icons/fluentui_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tmdb_app/base/constants.dart';
+import 'package:flutter_tmdb_app/components/no_internet_component.dart';
 import 'package:flutter_tmdb_app/controller/listPageContoller.dart';
+import 'package:flutter_tmdb_app/model/favorite.dart';
 import 'package:flutter_tmdb_app/view/detail_page.dart';
 import 'package:get/get.dart';
-
+import '../components/search_component.dart';
 import '../base/styles/app_styles.dart';
 
 class ListPage extends StatefulWidget {
@@ -34,78 +36,113 @@ class _ListPageState extends State<ListPage> {
         centerTitle: false,
         elevation: 0,
       ),
-      body: Obx(() => GridView.builder(
-            itemCount: listpagecontoller.MovieList.length,
-            itemBuilder: (context, index) {
-              var data = listpagecontoller.MovieList[index];
-              return Container(
-                child: Stack(
-                  children: [
-                    InkWell(
-                      onTap: (){
-                        listpagecontoller.selectedId.value = data['id'].toString();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>  DetailPage()),
-                        );
+      body: Column(
+        children: [
+          const SearchComponent(),
+          Obx(() => !listpagecontoller.isInternet.value
+              ? NoInternetComponent()
+              : SizedBox.shrink()),
+          Expanded(
+            child: Obx(() => GridView.builder(
+                  itemCount: listpagecontoller.MovieList.length,
+                  itemBuilder: (context, index) {
+                    var data = listpagecontoller.MovieList[index];
+                    return Container(
+                      child: Stack(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              listpagecontoller.selectedId.value =
+                                  data['id'].toString();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => DetailPage()),
+                              );
+                            },
+                            child:
+                            data["poster_path"]!=null?
+                            Image.network(
+                              '${Constants.image500}${data["poster_path"]}',
+                              fit: BoxFit.fill,
+                            ): Container(
+                              alignment: Alignment.center,
 
-                      },
-                      child: Image.network(
-                        '${Constants.image500}${data["poster_path"]}',
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            alignment: Alignment.bottomLeft,
-                            color: Color(0x80000000),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8),
-                                    child: Text(
-                                      "${data["original_title"]}",
-                                      style: TextStyle(
-                                        color: AppStyles.white,
-                                        fontSize: 18,
+                                child: Icon(FluentSystemIcons.ic_fluent_photo_filter_filled,size: 50,)),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  alignment: Alignment.bottomLeft,
+                                  color: Color(0x80000000),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          child: Text(
+                                            "${data["original_title"]??data["title"]}",
+                                            style: TextStyle(
+                                              color: AppStyles.white,
+                                              fontSize: 18,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
+                                      Obx(() => InkWell(
+                                          onTap: () async {
+                                            Favorite json = Favorite(
+                                                id: data["id"],
+                                                title: data["original_title"],
+                                                posterPath:
+                                                    data["poster_path"],
+                                            );
+                                            await listpagecontoller.setFavorites(
+                                                json, data);
+                                            setState(() {
 
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Icon(
-                                      FluentSystemIcons.ic_fluent_heart_filled,
-                                      size: 30,
-                                      color: AppStyles.white,
-                                    ),
-                                  ),
-                                )
-                              ],
-                            )),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 2 / 3,
-            ),
-          )),
+                                            });
+
+                                          },
+                                          child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child:
+                                                 Icon(
+                                                  FluentSystemIcons
+                                                      .ic_fluent_heart_filled,
+                                                  size: 30,
+                                                  color:  listpagecontoller
+                                                      .checkIsFav1(data['id'])
+                                                      .value
+                                                      ? AppStyles.red
+                                                      : AppStyles.white,
+                                                ),
+                                              ),
+                                        )
+                                      )
+                                    ],
+                                  )),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 2 / 3,
+                  ),
+                )),
+          ),
+        ],
+      ),
     );
   }
 }

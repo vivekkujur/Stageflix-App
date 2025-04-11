@@ -17,5 +17,11 @@ enum ButtonAction{
 
 
 class HiveBoxKey{
+  static const MOVIES ="movies";
+  static const MOVIES_List ="movies_list";
+
+
   static const FAV_MOVIES ="fav_movies";
+  static const FAV_MOVIES_List ="fav_movie_list";
+
 }
