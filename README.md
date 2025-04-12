@@ -26,9 +26,9 @@ In some cases, `tmdb.org` might be **blocked or filtered on certain Wi-Fi networ
 ---
 
 ## 📱 Screenshots
-<img src="assets/img1.jpeg.png" alt="App Screenshot" width="300"/>
-<img src="assets/img2.jpeg.png" alt="App Screenshot" width="300"/>
-<img src="assets/img3.jpeg.png" alt="App Screenshot" width="300"/>
+<img src="assets/img1.jpeg" alt="App Screenshot" width="300"/>
+<img src="assets/img2.jpeg" alt="App Screenshot" width="300"/>
+<img src="assets/img3.jpeg" alt="App Screenshot" width="300"/>
 
 
 ## Getting Started
