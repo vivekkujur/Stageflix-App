@@ -1,6 +1,35 @@
 # flutter_tmdb_app
 
-A new Flutter project.
+# 🎬 TMDB Movie App (Flutter)
+
+A Flutter application that displays trending movies using the [TMDB API](https://www.themoviedb.org/). Built with clean architecture and modern Flutter .
+
+## ⚠️ Network Issue Note
+
+**Having trouble fetching movie data?**
+
+Please try to **run the app using mobile data**.
+
+In some cases, `tmdb.org` might be **blocked or filtered on certain Wi-Fi networks**, which prevents the app from accessing the TMDB API.
+
+---
+
+## 🚀 Features
+
+- Fetches now playing movies from TMDB
+- Displays movie posters, titles, and release info
+- Clean UI built with Flutter widgets
+- Async API integration using `Dio`
+- offline db using Hive
+- Error handling and state management (Getx)
+
+---
+
+## 📱 Screenshots
+<img src="assets/img1.jpeg.png" alt="App Screenshot" width="300"/>
+<img src="assets/img2.jpeg.png" alt="App Screenshot" width="300"/>
+<img src="assets/img3.jpeg.png" alt="App Screenshot" width="300"/>
+
 
 ## Getting Started
 
