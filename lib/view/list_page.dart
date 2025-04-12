@@ -4,6 +4,7 @@ import 'package:flutter_tmdb_app/base/constants.dart';
 import 'package:flutter_tmdb_app/components/no_internet_component.dart';
 import 'package:flutter_tmdb_app/controller/listPageContoller.dart';
 import 'package:flutter_tmdb_app/model/favorite.dart';
+import 'package:flutter_tmdb_app/model/movie.dart';
 import 'package:flutter_tmdb_app/view/detail_page.dart';
 import 'package:get/get.dart';
 import '../components/search_component.dart';
@@ -19,19 +20,33 @@ class ListPage extends StatefulWidget {
 class _ListPageState extends State<ListPage> {
   @override
   Widget build(BuildContext context) {
+
+
+
+    print("render");
     final Listpagecontoller listpagecontoller = Get.put(Listpagecontoller());
+
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppStyles.red_main,
-        leading: Icon(
-          FluentSystemIcons.ic_fluent_data_bar_horizontal_filled,
-          color: AppStyles.white,
+        leading: InkWell(
+          onTap: (){
+            listpagecontoller.showFav.value  =   !listpagecontoller.showFav.value;
+
+            listpagecontoller.toggleList();
+          },
+          child: Icon(
+            FluentSystemIcons.ic_fluent_data_bar_horizontal_filled,
+            color: AppStyles.white,
+          ),
         ),
-        title: Text(
-          "Favorits",
-          style: TextStyle(color: AppStyles.white),
-          textAlign: TextAlign.left,
+        title: Obx(()=>
+           Text(
+            listpagecontoller.showFav.value? "Favorits" :"Now Playing",
+            style: TextStyle(color: AppStyles.white),
+            textAlign: TextAlign.left,
+          ),
         ),
         centerTitle: false,
         elevation: 0,
@@ -40,35 +55,42 @@ class _ListPageState extends State<ListPage> {
         children: [
           const SearchComponent(),
           Obx(() => !listpagecontoller.isInternet.value
-              ? NoInternetComponent()
-              : SizedBox.shrink()),
+              ? const NoInternetComponent()
+              : const SizedBox.shrink()),
           Expanded(
             child: Obx(() => GridView.builder(
+              controller: listpagecontoller.scrollController,
                   itemCount: listpagecontoller.MovieList.length,
                   itemBuilder: (context, index) {
                     var data = listpagecontoller.MovieList[index];
+
+
                     return Container(
                       child: Stack(
                         children: [
                           InkWell(
                             onTap: () {
-                              listpagecontoller.selectedId.value =
-                                  data['id'].toString();
+                          
+                              
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => DetailPage()),
+                                    builder: (context) => DetailPage(id: data.id,index: index,)),
                               );
                             },
-                            child:
-                            data["poster_path"]!=null?
-                            Image.network(
-                              '${Constants.image500}${data["poster_path"]}',
-                              fit: BoxFit.fill,
-                            ): Container(
-                              alignment: Alignment.center,
+                            child: listpagecontoller.isInternet==true
+                                ? Image.network(
+                                    '${Constants.image500}${data.posterPath}',
+                                    fit: BoxFit.fill,
 
-                                child: Icon(FluentSystemIcons.ic_fluent_photo_filter_filled,size: 50,)),
+                                  )
+                                : Container(
+                                    alignment: Alignment.center,
+                                    child: Icon(
+                                      FluentSystemIcons
+                                          .ic_fluent_photo_filter_filled,
+                                      size: 50,
+                                    )),
                           ),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -85,7 +107,8 @@ class _ListPageState extends State<ListPage> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 8),
                                           child: Text(
-                                            "${data["original_title"]??data["title"]}",
+                                            "${data.title}",
+                                            // "${data["original_title"]??data["title"]}",
                                             style: TextStyle(
                                               color: AppStyles.white,
                                               fontSize: 18,
@@ -95,37 +118,27 @@ class _ListPageState extends State<ListPage> {
                                           ),
                                         ),
                                       ),
-                                      Obx(() => InkWell(
-                                          onTap: () async {
-                                            Favorite json = Favorite(
-                                                id: data["id"],
-                                                title: data["original_title"],
-                                                posterPath:
-                                                    data["poster_path"],
-                                            );
-                                            await listpagecontoller.setFavorites(
-                                                json, data);
-                                            setState(() {
+                                      InkWell(
+                                        onTap: () async {
 
-                                            });
-
-                                          },
-                                          child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child:
-                                                 Icon(
+                                          await listpagecontoller.setFavorites2(
+                                               data);
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: data.isFavorite == true
+                                              ? Icon(
                                                   FluentSystemIcons
                                                       .ic_fluent_heart_filled,
                                                   size: 30,
-                                                  color:  listpagecontoller
-                                                      .checkIsFav1(data['id'])
-                                                      .value
-                                                      ? AppStyles.red
-                                                      : AppStyles.white,
+                                                  color: AppStyles.red)
+                                              : Icon(
+                                                  FluentSystemIcons
+                                                      .ic_fluent_heart_filled,
+                                                  size: 30,
+                                                  color: AppStyles.white,
                                                 ),
-                                              ),
-                                        )
+                                        ),
                                       )
                                     ],
                                   )),

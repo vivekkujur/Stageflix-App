@@ -3,25 +3,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tmdb_app/base/constants.dart';
 import 'package:flutter_tmdb_app/base/styles/app_styles.dart';
 import 'package:flutter_tmdb_app/components/no_internet_component.dart';
+import 'package:flutter_tmdb_app/model/movie.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-
 import '../controller/listPageContoller.dart';
 import '../model/favorite.dart';
 
 class DetailPage extends StatefulWidget {
-  const DetailPage({super.key});
+  const DetailPage({super.key, required this.id, required this.index});
+  final int id;
+  final int index;
+
 
   @override
-  State<DetailPage> createState() => _DetailPageState();
+  State<DetailPage> createState() => _DetailPageState(id,index);
 }
 
 class _DetailPageState extends State<DetailPage> {
   final Listpagecontoller listpagecontoller = Get.find();
+  final int id ;
+  final int index;
+
+
+  _DetailPageState(this.id, this.index);
 
   @override
   void initState() {
-    listpagecontoller.getMoviesDetailsApi();
+    listpagecontoller.getMoviesDetailsApi(id);
     super.initState();
   }
 
@@ -41,7 +48,7 @@ class _DetailPageState extends State<DetailPage> {
                       height: Get.height / 3,
                       width: Get.width,
                       child: Image.network(
-                        '${Constants.image500}${listpagecontoller.selectedMovie['backdrop_path']??""}',
+                        '${Constants.image500}${listpagecontoller.selectedMovie.value.backdropPath??""}',
                         fit: BoxFit.cover,
                       )),
                   Row(
@@ -52,7 +59,7 @@ class _DetailPageState extends State<DetailPage> {
                           height: Get.height / 4,
                           transform: Matrix4.translationValues(20, -20.0, 0.0),
                           child: Image.network(
-                            '${Constants.image500}${listpagecontoller.selectedMovie['poster_path']??""}',
+                            '${Constants.image500}${listpagecontoller.selectedMovie.value.posterPath??""}',
                             fit: BoxFit.fill,
                           )),
                       Expanded(
@@ -63,13 +70,13 @@ class _DetailPageState extends State<DetailPage> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              listpagecontoller.selectedMovie['original_title']??"",
+                              listpagecontoller.selectedMovie.value.title,
                               style: AppStyles.headerTextStyle1,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              listpagecontoller.selectedMovie['release_date']??"",
+                              listpagecontoller.selectedMovie.value.releaseDate,
                               style: AppStyles.textStyleGreyH2,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -83,14 +90,7 @@ class _DetailPageState extends State<DetailPage> {
                           child: Obx(()=>
                              InkWell(
                                onTap: () async {
-                                 Favorite json = Favorite(
-                                   id: listpagecontoller.selectedMovie["id"],
-                                   title: listpagecontoller.selectedMovie["original_title"],
-                                   posterPath:
-                                   listpagecontoller.selectedMovie["poster_path"],
-                                 );
-                                 await listpagecontoller.setFavorites(
-                                     json, listpagecontoller.selectedMovie);
+                                 await listpagecontoller.setFavorites2(listpagecontoller.selectedMovie.value  );
                                  setState(() {
 
                                  });
@@ -98,8 +98,8 @@ class _DetailPageState extends State<DetailPage> {
                                child: Icon(
                                 FluentSystemIcons.ic_fluent_heart_filled,
                                 size: 30,
-                                color: listpagecontoller.checkIsFav1(listpagecontoller.selectedMovie['id']??"").value? AppStyles.red:AppStyles.gray2,
-                                                           ),
+                                color: listpagecontoller.checkIsFav1(id)? AppStyles.red:AppStyles.gray2,
+                                  ),
                              ),
                           ),
                         ),
@@ -110,7 +110,7 @@ class _DetailPageState extends State<DetailPage> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      listpagecontoller.selectedMovie['overview']??'',
+                      listpagecontoller.selectedMovie.value.overview,
                       style: TextStyle(fontSize: 16),
                     ),
                   ),

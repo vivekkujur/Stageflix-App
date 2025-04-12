@@ -36,7 +36,7 @@ class SearchComponent extends StatelessWidget {
             listpagecontoller.getMoviesListApi();
           } else {
             final filteredList = listpagecontoller.MovieList.where((movie) =>
-                movie['original_title']??movie["title"].toString().toLowerCase().contains(value.toLowerCase())).toList();
+                movie.title.toString().toLowerCase().contains(value.toLowerCase())).toList();
             listpagecontoller.MovieList.value = filteredList;
           }
         },

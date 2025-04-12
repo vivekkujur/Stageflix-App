@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 
 
-@HiveType(typeId: 0) // Unique type ID for this model
+@HiveType(typeId: 0)
 class Favorite {
 
   @HiveField(1)
